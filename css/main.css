@@ -88,7 +88,6 @@ textarea {
     text-decoration: underline;
 }
 
-.sale-badge {
-  display: block;
-  margin-bottom: 5px; 
+.cart-controls button {
+    vertical-align: middle; 
 }
