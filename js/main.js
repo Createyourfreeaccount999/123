@@ -1,11 +1,15 @@
 Vue.component('product', {
-   props: {
-       premium: {
-           type: Boolean,
-           required: true
-       }
-   },
-   template: `
+    props: {
+        premium: {
+            type: Boolean,
+            required: true
+        },
+        cart: {
+            type: Array,
+            required: true
+        }
+    },
+    template: `
    <div class="product">
     <div class="product-image">
            <img :src="image" :alt="altText"/>
@@ -27,11 +31,6 @@ Vue.component('product', {
                    @mouseover="updateProduct(index)"
            ></div>
           
-
-           <div class="cart">
-               <p>Cart({{ cart }})</p>
-           </div>
-
            <button
                    v-on:click="addToCart"
                    :disabled="!inStock"
@@ -39,65 +38,91 @@ Vue.component('product', {
            >
                Add to cart
            </button>
+
+          <button
+          v-on:click="removeFromCart"
+          :disabled="!inCart"
+          :class="{ disabledButton: !inCart }"
+          >
+          Remove from cart
+            </button>
        
        </div>
    </div>
  `,
-   data() {
-       return {
-           product: "Socks",
-           brand: 'Vue Mastery',
-           selectedVariant: 0,
-           altText: "A pair of socks",
-           details: ['80% cotton', '20% polyester', 'Gender-neutral'],
-           variants: [
-               {
-                   variantId: 2234,
-                   variantColor: 'green',
-                   variantImage: "./assets/vmSocks-green-onWhite.jpg",
-                   variantQuantity: 10
-               },
-               {
-                   variantId: 2235,
-                   variantColor: 'blue',
-                   variantImage: "./assets/vmSocks-blue-onWhite.jpg",
-                   variantQuantity: 0
-               }
-           ],
-           cart: 0
-       }
-   },
-   methods: {
-       addToCart() {
-           this.cart += 1
-       },
-       updateProduct(index) {
-           this.selectedVariant = index;
-           console.log(index);
-       }
-   },
-   computed: {
-       title() {
-           return this.brand + ' ' + this.product;
-       },
-       image() {
-           return this.variants[this.selectedVariant].variantImage;
-       },
-       inStock() {
-           return this.variants[this.selectedVariant].variantQuantity
-       },
-       shipping() {
-           if (this.premium) {
-               return "Free";
-           } else {
-               return 2.99
-           }
-       }
-   }
+    data() {
+        return {
+            product: "Socks",
+            brand: 'Vue Mastery',
+            selectedVariant: 0,
+            altText: "A pair of socks",
+            details: ['80% cotton', '20% polyester', 'Gender-neutral'],
+            variants: [
+                {
+                    variantId: 2234,
+                    variantColor: 'green',
+                    variantImage: "./assets/vmSocks-green-onWhite.jpg",
+                    variantQuantity: 10
+                },
+                {
+                    variantId: 2235,
+                    variantColor: 'blue',
+                    variantImage: "./assets/vmSocks-blue-onWhite.jpg",
+                    variantQuantity: 0
+                }
+            ],
+        }
+    },
+    methods: {
+        addToCart() {
+            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
+        },
+        updateProduct(index) {
+            this.selectedVariant = index;
+            console.log(index);
+        },
+        removeFromCart() {
+            this.$emit('remove-from-cart', this.variants[this.selectedVariant].variantId);
+        }
+    },
+    computed: {
+        title() {
+            return this.brand + ' ' + this.product;
+        },
+        image() {
+            return this.variants[this.selectedVariant].variantImage;
+        },
+        inStock() {
+            return this.variants[this.selectedVariant].variantQuantity
+        },
+        shipping() {
+            if (this.premium) {
+                return "Free";
+            } else {
+                return 2.99
+            }
+        },
+        inCart() {
+            return this.cart.includes(this.variants[this.selectedVariant].variantId);
+        }
+    }
 })
 let app = new Vue({
-   el: '#app',
-   data: {
-       premium: true
-   }
+    el: '#app',
+    data: {
+        premium: true,
+        cart: []
+    },
+    methods: {
+        updateCart(id) {
+            this.cart.push(id);
+        },
+        removeFromCart(id) {
+            const index = this.cart.indexOf(id);
+            if (index !== -1) {
+                this.cart.splice(index, 1);
+            }
+        }
+    },
+
 })
