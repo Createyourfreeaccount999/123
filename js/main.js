@@ -74,7 +74,7 @@ Vue.component('product-tabs', {
             type: Array,
             required: false
         },
-         shipping: {
+        shipping: {
             type: [String, Number],
             required: true
         },
@@ -210,7 +210,7 @@ Vue.component('product', {
         }
     },
     computed: {
-       
+
         title() {
             return this.brand + ' ' + this.product;
         },
@@ -227,15 +227,20 @@ Vue.component('product', {
                 return 2.99
             }
         }
-        
-    },
 
-     mounted() {
+    },
+    
+    mounted() {
+        const savedReviews = localStorage.getItem('reviews');
+        if (savedReviews) {
+            this.reviews = JSON.parse(savedReviews);
+        }
         eventBus.$on('review-submitted', productReview => {
             this.reviews.push(productReview);
+            localStorage.setItem('reviews', JSON.stringify(this.reviews));
         });
     }
-    
+
 })
 let app = new Vue({
     el: '#app',
